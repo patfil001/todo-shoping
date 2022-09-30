@@ -1,20 +1,22 @@
 import "./App.css";
 import React from "react";
 import { useState } from "react";
+import { renderIntoDocument } from "react-dom/test-utils";
 
 function ShoppingList() {
 	const [inputValue, setInputValue] = useState("add items: ");
-	const [addElement, setAddElement] = useState([]);
+	const [leftStack, setLeftStack] = useState([]);
+	const [rightStack, setRightStack] = useState([]);
 
-	const doList = addElement.map((element, index) => {
+	const mappedAddElement = leftStack.map((element, index) => {
 		return (
 			<li>
 				{element}
 				<button
 					onClick={() => {
-						const del = [...addElement];
+						const del = [...leftStack];
 						del.splice(index, 1);
-						setAddElement([...del]);
+						setLeftStack([...del]);
 					}}>
 					del
 				</button>
@@ -22,23 +24,29 @@ function ShoppingList() {
 					disabled={index === 0}
 					onClick={() => {
 						const tempVar = element;
-						const prevVar = addElement[index - 1];
-						addElement[index - 1] = tempVar;
-						addElement[index] = prevVar;
-						setAddElement([...addElement]);
+						const prevVar = leftStack[index - 1];
+						leftStack[index - 1] = tempVar;
+						leftStack[index] = prevVar;
+						setLeftStack([...leftStack]);
 					}}>
 					⬆
 				</button>
 				<button
-					disabled={index === addElement.length - 1}
+					disabled={index === leftStack.length - 1}
 					onClick={() => {
 						const tempVar = element;
-						const prevVar = addElement[index + 1];
-						addElement[index + 1] = tempVar;
-						addElement[index] = prevVar;
-						setAddElement([...addElement]);
+						const prevVar = leftStack[index + 1];
+						leftStack[index + 1] = tempVar;
+						leftStack[index] = prevVar;
+						setLeftStack([...leftStack]);
 					}}>
 					⬇
+				</button>
+				<button
+					onClick={() => {
+						setRightStack([...rightStack, element]);
+					}}>
+					➡
 				</button>
 			</li>
 		);
@@ -48,8 +56,13 @@ function ShoppingList() {
 		<div>
 			<h1>Shopping List</h1>
 			<textarea>This is your personal shopping list</textarea>
-			<div id='ramka'>{doList}</div>
+			<div className='container'>
+				<div className='item'>{mappedAddElement}</div>
+				<p></p>
+				<div className='item'>{rightStack}</div>
+			</div>
 			<div className='show'>{inputValue}</div>
+			<p></p>
 			<input
 				value={inputValue}
 				onChange={element => {
@@ -58,7 +71,7 @@ function ShoppingList() {
 			/>
 			<button
 				onClick={() => {
-					setAddElement([...addElement, inputValue]);
+					setLeftStack([...leftStack, inputValue]);
 					setInputValue(" ");
 				}}>
 				add
